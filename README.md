@@ -1,22 +1,17 @@
 ## Project Title
 
 An Pytorch implementation of the paper: H. Wang et al., "CosFace: Large Margin Cosine Loss for Deep Face Recognition," 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition, Salt Lake City, UT, 2018, pp. 5265-5274.
-## Example
-Initialization
+### Training
 ```
-import functions as F
+python train.py
+```
+Loss during training process
 
-linear = F.Linear(num_classes)
-criterion = F.CosineLoss(num_classes)
-```
-Training
-```
-optimizer.zero_grad()
+![Image description](output/loss.png)
 
-output = model(data)
-output = linear(output)
-
-loss = criterion(output, target)
-loss.backward()
-optimizer.step()
+### Testing
 ```
+python test.py
+```
+Result
+![Image description](output/result.png)
