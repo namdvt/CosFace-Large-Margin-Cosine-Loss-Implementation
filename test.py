@@ -56,7 +56,7 @@ def test(test_loader, model):
 
 if __name__ == '__main__':
     transform = transforms.Compose([transforms.ToTensor()])
-    testset = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    testset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
     test_loader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=True)
 
     model = Model()

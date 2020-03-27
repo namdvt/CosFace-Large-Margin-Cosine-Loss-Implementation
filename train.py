@@ -10,6 +10,7 @@ import torch.optim as optim
 from cosine_margin_loss import CosineMarginLoss
 from model import Model
 from torch.utils.data import random_split
+device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
 
 
 def fit(epoch, model, optimizer, criterion, data_loader, phase='training'):
@@ -21,6 +22,8 @@ def fit(epoch, model, optimizer, criterion, data_loader, phase='training'):
     running_loss = 0.0
 
     for data, label in tqdm(data_loader):
+        data = data.to(device)
+        label = label.to(device)
         if phase == 'training':
             optimizer.zero_grad()
             output = model(data)
@@ -53,7 +56,7 @@ def train(batch_size, model, num_epochs, lr):
 
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, nesterov=True)
     scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, 50, 1)
-    criterion = CosineMarginLoss(embed_dim=3, num_classes=10)
+    criterion = CosineMarginLoss(embed_dim=3, num_classes=10).to(device)
 
     train_losses, val_losses = [], []
     for epoch in range(num_epochs):
@@ -80,8 +83,8 @@ def write_figures(train_losses, val_losses):
 
 
 if __name__ == "__main__":
-    model = Model()
-    num_epochs = 201
+    model = Model().to(device)
+    num_epochs = 100
     learning_rate = 0.1
-    batch_size = 64
+    batch_size = 32
     train(batch_size, model, num_epochs, learning_rate)
