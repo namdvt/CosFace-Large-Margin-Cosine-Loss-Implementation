@@ -1,3 +1,4 @@
+from tkinter import font
 import torch
 import torchvision
 import tqdm
@@ -7,9 +8,11 @@ from torchvision import transforms
 import matplotlib.pyplot as plt
 from model import Model
 import torch.nn.functional as F
+from glob import glob
+import imageio
 
 
-def plot(embeds, labels):
+def plot(embeds, labels, out_name):
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection='3d')
 
@@ -26,16 +29,29 @@ def plot(embeds, labels):
         x, y, z,  rstride=1, cstride=1, color='w', alpha=0.3, linewidth=0)
 
     embeds = np.stack(embeds)
-    ax.scatter(embeds[:, 0], embeds[:, 1], embeds[:, 2], c=labels, s=20)
+
+    colormap = plt.cm.gist_ncar
+    # colorst = [colormap(i) for i in range(10)] 
+
+
+
+    colorst =  plt.cm.rainbow(np.linspace(0, 1, 10))
+
+    color = list()
+    for l in labels.T[0]:
+        color.append(colorst[l])
+
+    ax.scatter(embeds[:, 0], embeds[:, 1], embeds[:, 2], c=np.stack(color), s=20)
 
     ax.set_xlim([-1, 1])
     ax.set_ylim([-1, 1])
     ax.set_zlim([-1, 1])
+    ax.text2D(0.05, 0.95, f'{out_name}', transform=ax.transAxes, fontsize=40)
     plt.tight_layout()
-    plt.savefig('output/result.png')
+    plt.savefig(f'output/{out_name}.png')
 
 
-def test(test_loader, model):
+def test(test_loader, model, out_name):
     all_embeds = []
     all_labels = []
     with torch.no_grad():
@@ -43,12 +59,12 @@ def test(test_loader, model):
             embed = model(data)[0]
             embed = F.normalize(embed, p=2, dim=1).squeeze().cpu().numpy()
             all_embeds.append(embed)
-            all_labels.append(label)
+            all_labels.append(label.cpu().numpy())
 
     all_embeds = np.array(all_embeds)
     all_labels = np.array(all_labels)
 
-    plot(all_embeds, all_labels)
+    plot(all_embeds, all_labels, out_name)
 
 
 if __name__ == '__main__':
@@ -58,6 +74,20 @@ if __name__ == '__main__':
 
     model = Model()
     model.eval()
-    model.load_state_dict(torch.load('output/weight.pth'))
 
-    test(test_loader, model)
+    # test(test_loader, model, 'init')
+    # for ckpt in glob('ckpts/*.pth'):
+    #     name = ckpt.split('/')[-1].split('.')[0].replace('ckpt_', '')
+    #     model.load_state_dict(torch.load(ckpt))
+
+    #     test(test_loader, model, name)
+
+    # name = 'e3'
+    # model.load_state_dict(torch.load('ckpts/ckpt_epoch_3.pth'))
+    # test(test_loader, model, name)
+
+    images = []
+    images.append(imageio.imread('output/_init.png'))
+    for i in range(30):
+        images.append(imageio.imread(f'output/epoch_{i}.png'))
+    imageio.mimsave('output/result.gif', images, duration=10)

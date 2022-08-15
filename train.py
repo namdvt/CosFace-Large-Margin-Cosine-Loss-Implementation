@@ -59,21 +59,14 @@ def train(batch_size, model, num_epochs, lr):
     val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, shuffle=True)
 
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, nesterov=True)
-    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30, 40], gamma=0.1)
+    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[15, 25], gamma=0.1)
     criterion = (CosineMarginLoss(embed_dim=3, num_classes=10).to(device), nn.CrossEntropyLoss())
 
-    train_losses, val_losses = [], []
     for epoch in range(num_epochs):
-        train_epoch_loss = fit(epoch, model, optimizer, criterion, train_loader, phase='training')
-        val_epoch_loss = fit(epoch, model, optimizer, criterion, val_loader, phase='validation')
+        fit(epoch, model, optimizer, criterion, train_loader, phase='training')
+        fit(epoch, model, optimizer, criterion, val_loader, phase='validation')
         print('-----------------------------------------')
-
-        if epoch == 0 or val_epoch_loss < np.min(val_losses):
-            torch.save(model.state_dict(), 'output/weight.pth')
-
-        train_losses.append(train_epoch_loss)
-        val_losses.append(val_epoch_loss)
-#        write_figures(train_losses, val_losses)
+        torch.save(model.state_dict(), f'ckpts/ckpt_epoch_{epoch}.pth')
 
         scheduler.step()
 
@@ -88,7 +81,7 @@ def write_figures(train_losses, val_losses):
 
 if __name__ == "__main__":
     model = Model().to(device)
-    num_epochs = 50
+    num_epochs = 30
     learning_rate = 0.01
     batch_size = 32
     train(batch_size, model, num_epochs, learning_rate)
