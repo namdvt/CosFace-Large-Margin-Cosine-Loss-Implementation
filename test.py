@@ -2,14 +2,11 @@ import torch
 import torchvision
 import tqdm
 import numpy as np
-from torch.utils.data import random_split
 from tqdm import tqdm
 from torchvision import transforms
 import matplotlib.pyplot as plt
 from model import Model
 import torch.nn.functional as F
-from matplotlib import cm, colors
-from mpl_toolkits.mplot3d import Axes3D
 
 
 def plot(embeds, labels):
@@ -43,7 +40,7 @@ def test(test_loader, model):
     all_labels = []
     with torch.no_grad():
         for data, label in tqdm(test_loader):
-            embed = model(data)
+            embed = model(data)[0]
             embed = F.normalize(embed, p=2, dim=1).squeeze().cpu().numpy()
             all_embeds.append(embed)
             all_labels.append(label)

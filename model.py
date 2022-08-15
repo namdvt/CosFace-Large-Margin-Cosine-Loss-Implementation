@@ -29,12 +29,13 @@ class Model(nn.Module):
             Conv2d(512, 1024, kernel_size=3),
             nn.AdaptiveAvgPool2d(1),
         )
-        self.fc = nn.Sequential(
-            nn.Linear(1024, 3)
-        )
+        self.fc = nn.Linear(1024, 3)
+        self.fc2 = nn.Linear(3, 10)
 
     def forward(self, x):
         x = self.conv(x)
         x = x.view(x.shape[0], -1)
-        x = self.fc(x)
-        return x
+        emb = self.fc(x)
+        logit = self.fc2(emb)
+
+        return emb, logit

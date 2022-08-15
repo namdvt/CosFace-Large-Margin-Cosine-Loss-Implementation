@@ -5,9 +5,9 @@ An Pytorch implementation of the Large Margin Cosine Large which was proposed by
 ```
 python train.py
 ```
-Loss during training process
+<!-- Loss during training process
 
-![Image description](output/loss.png)
+![Image description](output/loss.png) -->
 
 ### Testing
 ```
