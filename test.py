@@ -75,17 +75,15 @@ if __name__ == '__main__':
     model = Model()
     model.eval()
 
-    # test(test_loader, model, 'init')
-    # for ckpt in glob('ckpts/*.pth'):
-    #     name = ckpt.split('/')[-1].split('.')[0].replace('ckpt_', '')
-    #     model.load_state_dict(torch.load(ckpt))
+    # test all ckpts
+    test(test_loader, model, 'init')
+    for ckpt in glob('ckpts/*.pth'):
+        name = ckpt.split('/')[-1].split('.')[0].replace('ckpt_', '')
+        model.load_state_dict(torch.load(ckpt))
 
-    #     test(test_loader, model, name)
+        test(test_loader, model, name)
 
-    # name = 'e3'
-    # model.load_state_dict(torch.load('ckpts/ckpt_epoch_3.pth'))
-    # test(test_loader, model, name)
-
+    # create gif
     images = []
     images.append(imageio.imread('output/_init.png'))
     for i in range(30):
